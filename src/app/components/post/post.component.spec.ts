@@ -1,4 +1,6 @@
+import { DebugElement, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { first } from 'rxjs';
 import { Post } from 'src/app/models/post';
 
@@ -10,7 +12,8 @@ describe('PostComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [PostComponent]
+      declarations: [PostComponent],
+      schemas:[NO_ERRORS_SCHEMA]
     })
       .compileComponents();
 
@@ -37,10 +40,39 @@ describe('PostComponent', () => {
     };
     component.post = post;
 
-    component.delete.pipe(first()).subscribe(selectedPost =>{
+    component.delete.pipe(first()).subscribe(selectedPost => {
       expect(selectedPost).toEqual(post);
     });
 
     component.onDeletePost(new MouseEvent('click'));
+  });
+
+  it('should render the post title in the anchor element', () => {
+    const post: Post = {
+      "userId": 1,
+      "id": 1,
+      "title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
+      "body": "quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto"
+    };
+    component.post = post;
+    fixture.detectChanges();
+    const postElement : HTMLElement = fixture.nativeElement;
+    const a  = postElement.querySelector('a');
+    expect(a?.textContent).toEqual(post.title);
+  });
+
+  it('should render the post title in the anchor element using the debug element', () => {
+    const post: Post = {
+      "userId": 1,
+      "id": 1,
+      "title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
+      "body": "quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto"
+    };
+    component.post = post;
+    fixture.detectChanges();
+
+    const postDebugElement : DebugElement= fixture.debugElement;
+    const aElement : HTMLElement= postDebugElement.query(By.css('a')).nativeElement;
+    expect(aElement.textContent).toEqual(post.title);
   });
 });

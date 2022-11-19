@@ -1,26 +1,20 @@
-import { TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 import { Post } from 'src/app/models/post';
 import { PostService } from 'src/app/services/post/post.service';
+import { PostComponent } from '../post/post.component';
 
 import { PostsComponent } from './posts.component';
 
 describe('PostsComponent', () => {
   let component: PostsComponent;
-  // let fixture: ComponentFixture<PostsComponent>;
+  let fixture: ComponentFixture<PostsComponent>;
   let POSTS: Post[];
   let mockPostService: any;
 
   beforeEach(async () => {
-    // await TestBed.configureTestingModule({
-    //   declarations: [PostsComponent]
-    // })
-    //   .compileComponents();
-
-    // fixture = TestBed.createComponent(PostsComponent);
-    // component = fixture.componentInstance;
-    // fixture.detectChanges();
-
     POSTS = [{
       'userId': 1,
       'id': 1,
@@ -55,15 +49,17 @@ describe('PostsComponent', () => {
     mockPostService = jasmine.createSpyObj(['get', 'delete']);
 
     TestBed.configureTestingModule({
+      declarations: [PostsComponent, PostComponent],
       providers: [
-        PostsComponent,
         {
           provide: PostService,
           useValue: mockPostService
-        }]
+        }],
+        schemas:[NO_ERRORS_SCHEMA]
     });
 
-    component = TestBed.inject(PostsComponent);
+    fixture = TestBed.createComponent(PostsComponent);
+    component = fixture.componentInstance;
   });
 
   it('should create', () => {
@@ -93,5 +89,31 @@ describe('PostsComponent', () => {
       component.delete(POSTS[1]);
       expect(mockPostService.delete).toHaveBeenCalledTimes(1);
     });
+  });
+
+  it('should set posts from the service directly', () => {
+    mockPostService.get.and.returnValue(of(POSTS));
+
+    // ngOnit will be called
+    fixture.detectChanges();
+    expect(component.posts.length).toBe(POSTS.length);
+  });
+
+  it('should create one post child element for each post',()=>{
+    mockPostService.get.and.returnValue(of(POSTS));
+    fixture.detectChanges();
+
+    const dubugElement = fixture.debugElement;
+    const postElement = dubugElement.queryAll(By.css('.posts'));
+    expect(postElement.length).toBe(POSTS.length);
+  });
+
+  it('should create exact same number of posts components for posts',()=>{
+    mockPostService.get.and.returnValue(of(POSTS));
+    fixture.detectChanges();
+
+    // as we need to get the child components we are using the directive (By.directive) here
+    const postComponentsDEs = fixture.debugElement.queryAll(By.directive(PostComponent));
+    expect(postComponentsDEs.length).toEqual(POSTS.length);
   });
 });
