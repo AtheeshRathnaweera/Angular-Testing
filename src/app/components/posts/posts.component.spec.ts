@@ -116,4 +116,17 @@ describe('PostsComponent', () => {
     const postComponentsDEs = fixture.debugElement.queryAll(By.directive(PostComponent));
     expect(postComponentsDEs.length).toEqual(POSTS.length);
   });
+
+  it('should check whether exact post is sending to PostComponent',()=>{
+    mockPostService.get.and.returnValue(of(POSTS));
+    fixture.detectChanges();
+
+    const postComponentsDEs = fixture.debugElement.queryAll(By.directive(PostComponent));
+
+    for(let i=0;i<postComponentsDEs.length;i++){
+      let postComponentInstance = postComponentsDEs[i].componentInstance as PostComponent;
+      expect(postComponentInstance.post.title).toEqual(POSTS[i].title);
+    }
+
+  });
 });
