@@ -13,8 +13,12 @@ export class PostService {
     return this.http.get<Post[]>(`https://jsonplaceholder.typicode.com/posts`);
   }
 
-  getById(id:number){
+  getById(id: number) {
     return this.http.get<Post>(`https://jsonplaceholder.typicode.com/posts/${id}`);
+  }
+
+  update(post: Post) {
+    return this.http.put(`https://jsonplaceholder.typicode.com/posts/${post.id}`, post);
   }
 
   delete(post: Post) {

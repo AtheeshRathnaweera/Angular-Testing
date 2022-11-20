@@ -55,7 +55,7 @@ describe('PostsComponent', () => {
           provide: PostService,
           useValue: mockPostService
         }],
-        schemas:[NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA]
     });
 
     fixture = TestBed.createComponent(PostsComponent);
@@ -89,6 +89,40 @@ describe('PostsComponent', () => {
       component.delete(POSTS[1]);
       expect(mockPostService.delete).toHaveBeenCalledTimes(1);
     });
+
+    xit('should call delete method when post component button is clicked', () => {
+      // spy on parent components delete method
+      spyOn(component, 'delete');
+
+      mockPostService.get.and.returnValue(of(POSTS));
+      fixture.detectChanges();
+
+      // query all -> as we have more than one child element
+      let postComponentsDEs = fixture.debugElement.queryAll(By.directive(PostComponent));
+
+      for (let i = 0; i < postComponentsDEs.length; i++) {
+        postComponentsDEs[i].query(By.css('button')).triggerEventHandler('click', {
+          preventDefault: () => { }
+        });
+        expect(component.delete).toHaveBeenCalledWith(POSTS[i]);
+      }
+    });
+
+    it('should call the delete method when the delete event is emitted from child component', () => {
+      // spy on parent components delete method
+      spyOn(component, 'delete');
+
+      mockPostService.get.and.returnValue(of(POSTS));
+      fixture.detectChanges();
+
+      // query all -> as we have more than one child element
+      let postComponentsDEs = fixture.debugElement.queryAll(By.directive(PostComponent));
+
+      for (let i = 0; i < postComponentsDEs.length; i++) {
+        (postComponentsDEs[i].componentInstance as PostComponent).delete.emit(POSTS[i]);
+        expect(component.delete).toHaveBeenCalledWith(POSTS[i]);
+      }
+    });
   });
 
   it('should set posts from the service directly', () => {
@@ -99,7 +133,7 @@ describe('PostsComponent', () => {
     expect(component.posts.length).toBe(POSTS.length);
   });
 
-  it('should create one post child element for each post',()=>{
+  it('should create one post child element for each post', () => {
     mockPostService.get.and.returnValue(of(POSTS));
     fixture.detectChanges();
 
@@ -108,7 +142,7 @@ describe('PostsComponent', () => {
     expect(postElement.length).toBe(POSTS.length);
   });
 
-  it('should create exact same number of posts components for posts',()=>{
+  it('should create exact same number of posts components for posts', () => {
     mockPostService.get.and.returnValue(of(POSTS));
     fixture.detectChanges();
 
@@ -117,16 +151,15 @@ describe('PostsComponent', () => {
     expect(postComponentsDEs.length).toEqual(POSTS.length);
   });
 
-  it('should check whether exact post is sending to PostComponent',()=>{
+  it('should check whether exact post is sending to PostComponent', () => {
     mockPostService.get.and.returnValue(of(POSTS));
     fixture.detectChanges();
 
     const postComponentsDEs = fixture.debugElement.queryAll(By.directive(PostComponent));
 
-    for(let i=0;i<postComponentsDEs.length;i++){
+    for (let i = 0; i < postComponentsDEs.length; i++) {
       let postComponentInstance = postComponentsDEs[i].componentInstance as PostComponent;
       expect(postComponentInstance.post.title).toEqual(POSTS[i].title);
     }
-
   });
 });
