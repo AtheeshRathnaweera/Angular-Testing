@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { LoggerService } from '../logger/logger.service';
 
 import { CalculatorService } from './calculator.service';
 
@@ -8,10 +9,16 @@ describe('CalculatorService', () => {
 
   beforeEach(() => {
     console.log("calling before each");
-    // TestBed.configureTestingModule({});
-    // service = TestBed.inject(CalculatorService);
     mockLoggerService = jasmine.createSpyObj('LoggerService', ['log']);
-    service = new CalculatorService(mockLoggerService);
+
+    TestBed.configureTestingModule({
+      providers: [CalculatorService, {
+        provide: LoggerService,
+        useValue: mockLoggerService
+      }]
+    });
+
+    service = TestBed.inject(CalculatorService);
   });
 
   it('should be created', () => {
